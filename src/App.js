@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
-import Marketplace from "./abis/Marketplace.json";
+import Marketfair from "./abis/Marketfair.json";
+import { Flex } from "@chakra-ui/react";
 import { Nav } from "./components/Nav/Nav";
-import { CircularProgress, Flex } from "@chakra-ui/react";
-import { Main } from "./components/Main/Main";
+import { MainRoute } from "./Router";
 import { Loading } from "./components/Loading/Loading";
 
 const App = () => {
     const [account, setAccount] = useState("");
-    const [marketplace, setMarketplace] = useState();
+    const [marketfair, setMarketfair] = useState();
     const [productCount, setProductCount] = useState(0);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,22 +30,35 @@ const App = () => {
         setAccount(accounts[0]);
 
         const networkID = await web3.eth.net.getId();
-        const networkData = Marketplace.networks[networkID];
+        const networkData = Marketfair.networks[networkID];
 
         if (networkData) {
-            const marketplace = new web3.eth.Contract(
-                Marketplace.abi,
+            const marketfair = new web3.eth.Contract(
+                Marketfair.abi,
                 networkData.address
             );
-            setMarketplace(marketplace);
+            console.log(marketfair);
+            const productCount = await marketfair.methods.productCount().call();
+            console.log(`productCount`, productCount.toString());
+            setMarketfair(marketfair);
             setLoading(false);
         } else {
             window.alert(
-                "Marketplace contract not deployed to detected network."
+                "Marketfair contract not deployed to detected network."
             );
         }
 
         console.log(networkID);
+    };
+
+    const createProduct = (name, price, imageHash) => {
+        setLoading(true);
+        marketfair.methods
+            .createProduct(name, price, imageHash)
+            .send({ from: account })
+            .once("receipt", (receipt) => {
+                setLoading(false);
+            });
     };
 
     useEffect(() => {
@@ -62,7 +75,11 @@ const App = () => {
         >
             <Nav />
             <Flex flexDir="column" alignItems="center" h="full" flex="1 1 auto">
-                {loading ? <Loading /> : <Main />}
+                {loading ? (
+                    <Loading />
+                ) : (
+                    <MainRoute createProduct={createProduct} />
+                )}
             </Flex>
         </Flex>
     );
