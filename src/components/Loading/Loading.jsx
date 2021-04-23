@@ -7,7 +7,7 @@ export const Loading = () => {
             <CircularProgress
                 isIndeterminate
                 color="green.600"
-                size="120px"
+                size="80px"
                 thickness="4px"
             />
         </Box>
