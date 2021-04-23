@@ -9,7 +9,6 @@ import { Loading } from "./components/Loading/Loading";
 const App = () => {
     const [account, setAccount] = useState("");
     const [marketfair, setMarketfair] = useState();
-    const [productCount, setProductCount] = useState(0);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -37,9 +36,13 @@ const App = () => {
                 Marketfair.abi,
                 networkData.address
             );
-            console.log(marketfair);
+
             const productCount = await marketfair.methods.productCount().call();
-            console.log(`productCount`, productCount.toString());
+            for (let i = 1; i <= productCount; i++) {
+                const prod = await marketfair.methods.products(i).call();
+                setProducts(products.concat(prod));
+            }
+
             setMarketfair(marketfair);
             setLoading(false);
         } else {
@@ -47,8 +50,6 @@ const App = () => {
                 "Marketfair contract not deployed to detected network."
             );
         }
-
-        console.log(networkID);
     };
 
     const createProduct = (name, price, imageHash) => {
@@ -78,7 +79,10 @@ const App = () => {
                 {loading ? (
                     <Loading />
                 ) : (
-                    <MainRoute createProduct={createProduct} />
+                    <MainRoute
+                        createProduct={createProduct}
+                        products={products}
+                    />
                 )}
             </Flex>
         </Flex>
