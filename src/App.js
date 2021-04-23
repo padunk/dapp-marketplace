@@ -15,7 +15,7 @@ const App = () => {
     const loadWeb3 = async () => {
         if (window.ethereum) {
             window.web3 = new Web3(window.ethereum);
-            await window.ethereum.enable();
+            await window.ethereum.send("eth_requestAccounts");
         } else if (window.web3) {
             window.web3 = new Web3(window.web3.currentProvider);
         } else {
@@ -23,11 +23,18 @@ const App = () => {
         }
     };
 
+    const requestAccounts = async () => {
+        const web3 = window.web3;
+        try {
+            const accounts = await web3.eth.getAccounts();
+            setAccount(accounts[0]);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const loadBlockchainData = async () => {
         const web3 = window.web3;
-        const accounts = await web3.eth.getAccounts();
-        setAccount(accounts[0]);
-
         const networkID = await web3.eth.net.getId();
         const networkData = Marketfair.networks[networkID];
 
@@ -36,13 +43,11 @@ const App = () => {
                 Marketfair.abi,
                 networkData.address
             );
-
             const productCount = await marketfair.methods.productCount().call();
             for (let i = 1; i <= productCount; i++) {
                 const prod = await marketfair.methods.products(i).call();
                 setProducts(products.concat(prod));
             }
-
             setMarketfair(marketfair);
             setLoading(false);
         } else {
@@ -62,8 +67,28 @@ const App = () => {
             });
     };
 
+    const purchaseProduct = (id, price) => {
+        setLoading(true);
+        marketfair.methods
+            .purchaseProduct(id)
+            .send({
+                from: account,
+                value: price,
+            })
+            .on("receipt", () => {
+                setLoading(false);
+                // refresh the ownership
+                loadBlockchainData();
+            })
+            .on("error", (err) => {
+                setLoading(false);
+                window.alert(`${err.message}`);
+            });
+    };
+
     useEffect(() => {
         loadWeb3();
+        requestAccounts();
         loadBlockchainData();
     }, []);
 
@@ -82,6 +107,7 @@ const App = () => {
                     <MainRoute
                         createProduct={createProduct}
                         products={products}
+                        purchaseProduct={purchaseProduct}
                     />
                 )}
             </Flex>
