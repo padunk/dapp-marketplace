@@ -1,16 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.3;
+pragma solidity 0.8.4;
 
-contract Marketplace {
+contract Marketfair {
     string public name;
     uint public productCount = 0;
     mapping(uint => Product) public products;
+    mapping(address=>Image[]) private images;
+
+    struct Image{
+        string imageHash;
+        string ipfsInfo;
+    }
 
     struct Product {
         uint id;
         string name;
         uint price;
         address owner;
+        string imageHash;
         bool purchased;
     }
 
@@ -31,10 +38,14 @@ contract Marketplace {
     );
 
     constructor() {
-        name = 'Dapp Marketplace';
+        name = 'Dapp Marketfair';
     }
 
-    function createProduct(string memory _name, uint _price) public {
+    function uploadImage(string memory _hash, string memory _ipfs) public{
+        images[msg.sender].push(Image(_hash, _ipfs)); //
+    }
+
+    function createProduct(string memory _name, uint _price, string memory _imageHash) public {
         // require a valid name
         require(bytes(_name).length > 0);
         // require a valid price
@@ -42,7 +53,7 @@ contract Marketplace {
         // increment product count
         productCount++;
         // create product
-        products[productCount] = Product(productCount, _name, _price, msg.sender, false);
+        products[productCount] = Product(productCount, _name, _price, msg.sender, _imageHash, false);
 
         // trigger an event
         emit ProductCreated(productCount, _name, _price, msg.sender, false);
