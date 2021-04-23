@@ -18,7 +18,7 @@ export const Nav = () => {
                 color="orange.500"
                 px="4"
             >
-                <a href="/home">Dapp Marketplace</a>
+                <a href="/home">Dapp Marketfair</a>
             </Heading>
 
             <List display="flex" justifyContent="center" alignItems="center">
