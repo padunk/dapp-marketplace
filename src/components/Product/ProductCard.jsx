@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Image, Badge, Button } from "@chakra-ui/react";
 
-export const ProductCard = ({ product }) => {
+export const ProductCard = ({ product, purchaseProduct }) => {
     return (
         <Box maxW="60" borderWidth="1px" borderRadius="lg" overflow="hidden">
             <Image
@@ -26,6 +26,11 @@ export const ProductCard = ({ product }) => {
                 >
                     {product.name}
                 </Box>
+                <Box color="gray.500" isTruncated>
+                    {product.purchased
+                        ? `Sold to: ${product.owner}`
+                        : product.owner}
+                </Box>
                 <Box
                     d="flex"
                     justifyContent="space-between"
@@ -38,16 +43,21 @@ export const ProductCard = ({ product }) => {
                         {product.price / 10 ** 18}
                     </Box>
 
-                    <Button
-                        borderRadius="full"
-                        bg="teal.400"
-                        _hover={{
-                            bg: "teal.200",
-                        }}
-                        color="blackAlpha.900"
-                    >
-                        Buy
-                    </Button>
+                    {!product.purchased && (
+                        <Button
+                            borderRadius="full"
+                            bg="teal.400"
+                            _hover={{
+                                bg: "teal.200",
+                            }}
+                            color="blackAlpha.900"
+                            onClick={() =>
+                                purchaseProduct(product.id, product.price)
+                            }
+                        >
+                            Buy
+                        </Button>
+                    )}
                 </Box>
             </Box>
         </Box>

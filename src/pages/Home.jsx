@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Heading } from "@chakra-ui/react";
 import { ProductCard } from "../components/Product/ProductCard";
 
-export const Home = ({ products }) => {
+export const Home = ({ products, purchaseProduct }) => {
     return (
         <Flex flexDirection="column" color="whitesmoke">
             <Heading py="8" textAlign="center">
@@ -14,7 +14,11 @@ export const Home = ({ products }) => {
                 ) : (
                     products.map((product) => {
                         return (
-                            <ProductCard product={product} key={product.id} />
+                            <ProductCard
+                                product={product}
+                                key={product.id}
+                                purchaseProduct={purchaseProduct}
+                            />
                         );
                     })
                 )}
