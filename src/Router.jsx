@@ -1,16 +1,16 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { Home } from "../../pages/Home";
-import { AddProduct } from "../../pages/AddProduct";
+import { Home } from "./pages/Home";
+import { AddProduct } from "./pages/AddProduct";
 
-export const Main = () => {
+export const MainRoute = ({ createProduct }) => {
     return (
         <Switch>
             <Route path="/" exact>
                 <Home />
             </Route>
             <Route path="/add-product">
-                <AddProduct />
+                <AddProduct createProduct={createProduct} />
             </Route>
             <Route path="*">
                 <h2>404</h2>
