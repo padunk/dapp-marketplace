@@ -51,6 +51,7 @@ const App = () => {
             setMarketfair(marketfair);
             setLoading(false);
         } else {
+            setLoading(false);
             window.alert(
                 "Marketfair contract not deployed to detected network."
             );
