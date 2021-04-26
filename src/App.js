@@ -44,6 +44,9 @@ const App = () => {
                 networkData.address
             );
             const productCount = await marketfair.methods.productCount().call();
+            if (products.length > 0) {
+                setProducts([]);
+            }
             for (let i = 1; i <= productCount; i++) {
                 const prod = await marketfair.methods.products(i).call();
                 setProducts(products.concat(prod));
@@ -63,8 +66,12 @@ const App = () => {
         marketfair.methods
             .createProduct(name, price, imageHash)
             .send({ from: account })
-            .once("receipt", (receipt) => {
+            .on("receipt", () => {
                 setLoading(false);
+            })
+            .on("error", (err) => {
+                setLoading(false);
+                window.alert(`${err.message}`);
             });
     };
 
